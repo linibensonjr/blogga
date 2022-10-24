@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+{% if current_user.is_authenticated %}
+  <h1>Welcome! You are logged in as {{current_user}}</h1>
+{% else %}
+<div class="p-4 p-md-5 mb-4 rounded text-bg-dark">
+    <div class="col-md-6 px-0">
+      <h1 class="display-4 fst-italic">{{post.title}}</h1>
+      <p class="lead my-3">{{post.date_published}}</p>
+      <p class="lead mb-0"><a href="#" class="text-white fw-bold">Iniobong Benson</a></p>
+    </div>
+  </div>
+<h3></h3>
+{{post.content}}
+
+{% endif %}
+{% endblock content %}
