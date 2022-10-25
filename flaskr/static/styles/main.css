@@ -1,0 +1,13 @@
+html, body {
+    box-sizing: border-box;
+}
+
+.title {
+    text-align: left;
+    font-weight: bold;
+}
+
+.author {
+    color: red;
+    text-align: right;
+}
