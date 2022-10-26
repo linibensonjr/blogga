@@ -11,3 +11,9 @@ html, body {
     color: red;
     text-align: right;
 }
+
+.error-message {
+    background-color: red;
+    height: 50px;
+    color: white;
+}
