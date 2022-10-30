@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+{% if current_user.is_authenticated %}
+  <h1>Welcome! You are logged in as {{current_user}}</h1>
+  {% for blog in blog %}
+<p>Post</p>{{blog.title}}
+{{blog.date_published}}
+{% endfor %}
+
+
+
+{% else %}
+  <h1>Your </h1>
+  <a href="{{url_for('login')}}"><button type="button" class="btn btn-primary">Login</button></a> or
+  <a href="{{url_for('signup')}}"><button type="button" class="btn btn-primary">Sign-up</button></a>
+
+
+{% endif %}
+
+<div class="back"></div>
+
+
+
+{% endblock content %}

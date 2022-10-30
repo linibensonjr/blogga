@@ -1,39 +1,132 @@
-from flask import Flask, render_template,redirect, url_for, request
+from flask import Flask, render_template,redirect, url_for, request, flash, session, abort
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user
+from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
 from flask_sqlalchemy import SQLAlchemy
-from models import *
+from flask_migrate import Migrate
+# from models import Blog, User, db
 import os
+from datetime import datetime
 
 base_dir = os.path.dirname(os.path.realpath(__file__))
 
 app = Flask(__name__)
 
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+
 app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///' + os.path.join(base_dir, 'blogga.db')
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SECRET_KEY"] = "secret"
 
-login_manager = LoginManager(app)
-# login_manager.init_app(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+class Blog(db.Model):
+    __tablename__ = "Blog"
+
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String, unique=True, nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    date_published = db.Column(db.DateTime)
+    author = db.Column(db.String, default="Iniobong Benson")
+    
+    def __repr__(self):
+        return f"<Blog {self.id}"
+
+
+class User(db.Model, UserMixin):
+    __tablename__ = "User"
+
+    id = db.Column(db.Integer(), primary_key=True)
+    first_name = db.Column(db.String(50), nullable=False)
+    last_name = db.Column(db.String(50), nullable=False)
+    username = db.Column(db.String(255), nullable=False, unique=True)
+    email = db.Column(db.String(255), nullable=False, unique=True)
+    password_hash = db.Column(db.Text(), nullable=False)
+
+    def __repr__(self):
+        return f"{self.first_name}"
+
+
+db.create_all()
+
 
 @login_manager.user_loader
-def user_loader(id):
-    return User.query.get(id)
+def user_loader(user_id):
+    return User.query.get(user_id)
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    posts = Blog.query.all()
+    print(session)
+    return render_template('index.html', posts=posts)
 
 @app.route('/blog')
 def blog():
-    return render_template('index.html')
+    blog = Blog.query.filter_by(author=str(current_user)).all()
+    # print(current_user, session['_user_id'])
+    print(blog)
+    return render_template('blog/blog.html', blog=blog)
+
+@app.route('/post', methods=['GET'])
+def post():
+    return render_template('blog/add_post.html')
+
+
+@app.route('/post', methods=['GET', 'POST'])
+@login_required
+def add_post():
+    title = request.form.get('title')
+    content = request.form.get('content')
+    date_published = datetime.now()
+    author = current_user.first_name
+    new_post = Blog(title=title, content=content, date_published=date_published, author=author)
+    if new_post is None:
+        flash("Error - Your post title or content is empty")
+        return redirect(url_for('post'))
+    else:
+        db.session.add(new_post)
+        db.session.commit()
+        return redirect(url_for('blog'))
+
+
+@app.route('/post/<int:id>')
+def get_post(id):
+    post = Blog.query.filter_by(id=id).first()
+    return render_template('blog/post_detail.html', post=post)
+
+@app.route('/post/<int:id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_post(id):
+    post = Blog.query.get_or_404(id)
+    print('Editer', post, post.author)
+    if post.author != current_user.first_name:
+        abort(403)
+    else:
+        if request.method == 'POST':
+            title = request.form.get('title')
+            content = request.form.get('content')
+            post.title = title
+            post.body = content
+            db.session.commit()
+            return redirect(url_for('index'))
+    return render_template('blog/edit_post.html', post=post)
+    
+@app.route('/post/<int:id>/delete', methods=['GET', 'POST'])
+# @login_required
+def delete_post(id):
+    post = Blog.query.get(id)
+    db.session.delete(post)
+    db.session.commit()
+    return redirect(url_for('blog'))
 
 @app.route('/about')
 def about():
-    return render_template('index.html')
+    return render_template('about.html')
 
 @app.route('/contact')
 def contact():
-    return render_template('index.html')
+    return render_template('contact.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -44,36 +137,41 @@ def login():
 
     if user and check_password_hash(user.password_hash, password):
         login_user(user)
-        flask.flash('Logged in successfully.')
+        flash('You were successfully logged in')
         return redirect(url_for('index'))
 
-    return render_template('login.html')
+    else:
+        flash('Invalid username or password')
+    return render_template('auth/login.html')
 
 @app.route('/signup', methods=['GET', 'POST'])
-def register():
+def signup():
     if request.method == 'POST':
+        first_name = request.form.get('first_name')
+        last_name = request.form.get('last_name')
         username = request.form.get('username')
         email = request.form.get('email')
         password = request.form.get('password')
-        confirm = request.form.get('confirm')
 
         user = User.query.filter_by(username=username).first()
         if user:
-            return redirect(url_for('register'))
+            flash("Account already exists")
+            return redirect(url_for('signup'))
 
         email_exists = User.query.filter_by(email=email).first()
         if email_exists:
-            return redirect(url_for('register'))
+            flash("Email already taken")
+            return redirect(url_for('signup'))
 
         password_hash = generate_password_hash(password)
 
-        new_user = User(username=username, email=email, password_hash=password_hash)
+        new_user = User(first_name=first_name, last_name=last_name, username=username, email=email, password_hash=password_hash)
         db.session.add(new_user)
         db.session.commit()
 
         return redirect(url_for('login'))
 
-    return render_template('signup.html')
+    return render_template('auth/signup.html')
 
 
 @app.route('/logout')

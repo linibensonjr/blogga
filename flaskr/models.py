@@ -8,7 +8,7 @@ except:
 
 db = SQLAlchemy(app)
 
-class Venue(db.Model):
+class Blog(db.Model):
     __tablename__ = "Blog"
 
     id = db.Column(db.Integer, primary_key=True)

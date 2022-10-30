@@ -12,8 +12,13 @@ html, body {
     text-align: right;
 }
 
-.error-message {
+/* .error-message {
     background-color: red;
     height: 50px;
     color: white;
+} */
+
+.back {
+    height: 150px;
+    background-color: blue;
 }
