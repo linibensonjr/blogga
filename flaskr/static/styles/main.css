@@ -2,6 +2,10 @@ html, body {
     box-sizing: border-box;
 }
 
+a {
+    text-decoration: none;
+}
+
 .title {
     text-align: left;
     font-weight: bold;
@@ -21,4 +25,17 @@ html, body {
 .back {
     height: 150px;
     background-color: blue;
+}
+
+.post-banner {
+    text-align: center
+}
+
+.post-detail {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: auto;
+    width: 30%;
+    justify-content: space-evenly;
 }

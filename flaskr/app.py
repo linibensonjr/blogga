@@ -68,12 +68,13 @@ def blog():
     print(blog)
     return render_template('blog/blog.html', blog=blog)
 
-@app.route('/post', methods=['GET'])
-def post():
-    return render_template('blog/add_post.html')
-
-
 @app.route('/post', methods=['GET', 'POST'])
+@login_required
+def post():
+    return render_template('blog/create.html')
+
+
+@app.route('/addpost', methods=['GET', 'POST'])
 @login_required
 def add_post():
     title = request.form.get('title')
@@ -81,8 +82,9 @@ def add_post():
     date_published = datetime.now()
     author = current_user.first_name
     new_post = Blog(title=title, content=content, date_published=date_published, author=author)
+    print(new_post)
     if new_post is None:
-        flash("Error - Your post title or content is empty")
+        print("Error - Your post title or content is empty")
         return redirect(url_for('post'))
     else:
         db.session.add(new_post)
@@ -99,26 +101,32 @@ def get_post(id):
 @login_required
 def edit_post(id):
     post = Blog.query.get_or_404(id)
+    if request.method == 'GET':
+        return render_template('blog/edit_post.html', post=post)
     print('Editer', post, post.author)
     if post.author != current_user.first_name:
         abort(403)
-    else:
-        if request.method == 'POST':
+    if request.method == 'POST':
             title = request.form.get('title')
             content = request.form.get('content')
             post.title = title
             post.body = content
             db.session.commit()
             return redirect(url_for('index'))
-    return render_template('blog/edit_post.html', post=post)
+    
     
 @app.route('/post/<int:id>/delete', methods=['GET', 'POST'])
-# @login_required
+@login_required
 def delete_post(id):
-    post = Blog.query.get(id)
-    db.session.delete(post)
-    db.session.commit()
-    return redirect(url_for('blog'))
+    post = Blog.query.get_or_404(id)
+    if post.author != current_user.first_name:
+        abort(403)
+    else:
+        
+        db.session.delete(post)
+        db.session.commit()
+        flash('Post deleted successfully')
+        return redirect(url_for('blog'))
 
 @app.route('/about')
 def about():
