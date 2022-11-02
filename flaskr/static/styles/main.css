@@ -16,11 +16,11 @@ a {
     text-align: right;
 }
 
-/* .error-message {
+.message {
     background-color: red;
     height: 50px;
     color: white;
-} */
+}
 
 .back {
     height: 150px;
@@ -38,4 +38,18 @@ a {
     margin: auto;
     width: 30%;
     justify-content: space-evenly;
+}
+
+.center {
+    text-align: center;
+}
+
+form .btn {
+    
+    color: white;
+    border: none;
+    width: 30%;
+    padding: 10px;
+    margin: 5px;
+    text-align: center;
 }
