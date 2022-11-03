@@ -6,6 +6,8 @@ from flask_migrate import Migrate
 # from models import Blog, User, db
 import os
 from datetime import datetime
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 
 base_dir = os.path.dirname(os.path.realpath(__file__))
 
@@ -55,7 +57,7 @@ db.create_all()
 def user_loader(user_id):
     return User.query.get(user_id)
 
-@app.route('/')
+@app.route('/', methods=['GET'])
 def index():
     posts = Blog.query.all()
     print(session)
@@ -71,25 +73,28 @@ def blog():
 @app.route('/post', methods=['GET', 'POST'])
 @login_required
 def post():
+    if request.method == "POST":
+        title = request.form.get('title')
+        content = request.form.get('content')
+        date_published = datetime.now()
+        author = current_user.first_name
+        new_post = Blog(title=title, content=content, date_published=date_published, author=author)
+        print(new_post)
+        if new_post is None:
+            print("Error - Your post title or content is empty")
+            return redirect(url_for('post'))
+        else:
+            db.session.add(new_post)
+            db.session.commit()
+            return redirect(url_for('blog'))
     return render_template('blog/create.html')
 
 
 @app.route('/addpost', methods=['GET', 'POST'])
 @login_required
 def add_post():
-    title = request.form.get('title')
-    content = request.form.get('content')
-    date_published = datetime.now()
-    author = current_user.first_name
-    new_post = Blog(title=title, content=content, date_published=date_published, author=author)
-    print(new_post)
-    if new_post is None:
-        print("Error - Your post title or content is empty")
-        return redirect(url_for('post'))
-    else:
-        db.session.add(new_post)
-        db.session.commit()
-        return redirect(url_for('blog'))
+    pass
+    
 
 
 @app.route('/post/<int:id>')
@@ -101,18 +106,22 @@ def get_post(id):
 @login_required
 def edit_post(id):
     post = Blog.query.get_or_404(id)
-    if request.method == 'GET':
-        return render_template('blog/edit_post.html', post=post)
-    print('Editer', post, post.author)
     if post.author != current_user.first_name:
-        abort(403)
+        flash("You can't do that")
+        
+        abort(403, "<h1>403 Forbidden</h1>")
+        
     if request.method == 'POST':
             title = request.form.get('title')
             content = request.form.get('content')
             post.title = title
-            post.body = content
+            post.content = content
             db.session.commit()
-            return redirect(url_for('index'))
+            return redirect(url_for('get_post', id=post.id))
+    else:
+
+        return render_template('blog/edit_post.html', post=post)
+   
     
     
 @app.route('/post/<int:id>/delete', methods=['GET', 'POST'])
@@ -134,6 +143,23 @@ def about():
 
 @app.route('/contact')
 def contact():
+    # using SendGrid's Python Library
+# https://github.com/sendgrid/sendgrid-python
+
+
+    message = Mail(
+        from_email=request.form.get('email'),
+        to_emails='linibensojr@example.com',
+        subject=request.form.get('subject'),
+        html_content=request.form.get('message'))
+    try:
+        sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
+        response = sg.send(message)
+        print(response.status_code)
+        print(response.body)
+        print(response.headers)
+    except Exception as e:
+        pass
     return render_template('contact.html')
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -186,6 +212,18 @@ def signup():
 def logout():
     logout_user()
     return redirect(url_for('index'))
+
+@login_manager.unauthorized_handler
+def unauthorized():
+    """Redirect unauthorized users to Login page."""
+    flash('You must be logged in to view that page.')
+    return redirect(url_for('login'))
+
+# @login_manager.forbidden_handler
+# def forbidden():
+#     """Redirect unauthorized users to Login page."""
+#     flash('You must be logged in to view that page.')
+#     return redirect(url_for('login'))
 
 if __name__ == '__main__':
     app.run(debug=True)
