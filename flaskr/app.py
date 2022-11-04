@@ -59,11 +59,11 @@ def user_loader(user_id):
 
 @app.route('/', methods=['GET'])
 def index():
-    posts = Blog.query.all()
-    print(session)
-    return render_template('index.html', posts=posts)
+    # posts = Blog.query.all()
+    # print(session)
+    return render_template('index.html')
 
-@app.route('/blog')
+@app.route('/')
 def blog():
     blog = Blog.query.filter_by(author=str(current_user)).all()
     # print(current_user, session['_user_id'])
@@ -162,7 +162,7 @@ def contact():
         pass
     return render_template('contact.html')
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login', methods=['POST', 'GET'])
 def login():
     username = request.form.get('username')
     password = request.form.get('password')
