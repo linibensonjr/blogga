@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    <div class="container col-xxl-8 px-4 py-5">
+      <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
+        <div class="col-10 col-sm-8 col-lg-6">
+          <img src="static/img/bloggur.png" class="d-block mx-lg-auto img-fluid" alt="Bootstrap Themes" width="700" height="500" loading="lazy">
+        </div>
+        <div class="col-lg-6">
+          <h1 class="display-5 fw-bold lh-1 mb-3">Bloggur</h1>
+          <p class="lead">Bloggur is a community where you can post your thought and share ideas with a vast array of tech audience. It is the home of amazing contents. Join other Blugs and get access to premium posts and you might just get inspired for your next project.</p>
+          <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+            <a href="{{url_for('signup')}}"><button type="button" class="btn btn-warning btn-lg px-4 me-md-2">Join</button></a>
+            <a href="#post"><button type="button" class="btn btn-outline-secondary btn-lg px-4">Explore</button></a>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+  
+<div class="container">
+    <div class="row mb-2">
+      <h2>Latest Post</h2>
+        {% for post in posts %}
+      <div id="posts" class="col-md-4 post">       
+        <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+          <div class="picture"></div>
+          <div class="col p-4 d-flex flex-column position-static">
+            <h3 class="mb-0">{{post.title}}</h3>
+            <div class="mb-1 text-muted">{{post.date_published.strftime('%Y-%m-%d')}}</div>
+            <p class="card-text mb-auto">{{post.content |truncate(120)}}</p>
+            <a href="/post/{{post.id}}" class="stretched-link">Continue reading</a>
+            <strong class="author">{{post.author}}</strong>
+          </div>
+        </div>
+      </div>
+
+{% endfor %}
+    </div>
+    </div>
+
+
+{% endblock content %}
