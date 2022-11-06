@@ -1,16 +1,42 @@
 {% extends 'base.html' %}
 {% block content %}
 
-  <main class="container">
-    <div class="p-4 p-md-5 mb-4 rounded text-bg-dark">
-      <div class="col-md-6 px-0">
-        <h1 class="display-4 fst-italic">Blogga</h1>
-        <p class="lead my-3">Multiple lines of text that form the lede, informing new readers quickly and efficiently about what’s most interesting in this post’s contents.</p>
-        <p class="lead mb-0"><a href="#" class="text-white fw-bold">Continue reading...</a></p>
+<main>
+  <div class="blog-head ">
+    <div class="row gx-4 gx-lg-5 justify-content-center">
+      <div class="col-md-10 col-lg-8 col-xl-7">
+        <h1 class="center">About</h1>
       </div>
     </div>
-    <div class="about">
-      <p>Bloggur is a community where you can post your thought and share ideas with a vast array of tech audience. It is the home of amazing contents. Join other Blugs and get access to premium posts and you might just get inspired for youe next project.</p>
+  </div>
+
+
+  <article class="mb-4">
+    <div class="container px-4 px-lg-5">
+      <div class="row gx-4 gx-lg-5 justify-content-center">
+        <div class="col-md-10 col-lg-8 col-xl-7 post-details">
+          <p class="">Bloggur is a community where you can post your thought and share ideas with a vast
+            array of tech audience. It is the home of amazing contents. Join other Blugs and get access to premium posts
+            and you might just get inspired for youe next project</p>
+
+            <h3 class="center">What we stand for?
+            </h3>
+            <strong>Community</strong><br>
+            We are community-oriented. We do not only serve as a go-to and central platform for everything geospatial but also
+            the people behind the technologies. We are building a high-powered community where relevant information and
+            necessary resources can be shared across the geospatial people and organizations. We are bridging the wide gap
+            between geospatial technology and the people.<br><br>
+
+            <strong>Creativity is an activity</strong><br>
+            We believe every new day is an opportunity to build new things, therefore there is need share ideas and create contents that people can learn from and
+            our users and the tech community better.
+            </div>
+      </div>
     </div>
-    </main>
+    
+  </article>
+
+
+
+</main>
 {% endblock content %}

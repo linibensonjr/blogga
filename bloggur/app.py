@@ -17,7 +17,7 @@ app = Flask(__name__)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///' + os.path.join(base_dir, 'blogga.db')
+app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///' + os.path.join(base_dir, 'bloggur.db')
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = "secret"
 
@@ -154,7 +154,7 @@ def contact():
             print(response.status_code)
             print(response.body)
             print(response.headers)
-            flash('Message sent successfully')
+            flash('Message sent successfully', category='success')
         except Exception as e:
             pass
     return render_template('contact.html')
