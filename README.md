@@ -1,4 +1,4 @@
-# blogga
+# bloggur
 
 ### Requirements
 `Python 3`
