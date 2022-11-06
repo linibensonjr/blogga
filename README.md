@@ -17,4 +17,4 @@ Activate the enviroment
 Install the modules
 `pip install -r requirements.txt`
 
-![image](/flaskr/assets/index.png)
+![image](/bloggur/assets/index.png)
