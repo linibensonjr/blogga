@@ -1,19 +1,21 @@
 {% extends 'base.html' %}
 {% block content %}
 
-  <main class="container">
-    <div class="p-4 p-md-5 mb-4 rounded text-bg-dark">
-      <div class="col-md-6 px-0">
-        <h1 class="display-4 fst-italic">Blogga</h1>
-        <p class="lead my-3">Multiple lines of text that form the lede, informing new readers quickly and efficiently about what’s most interesting in this post’s contents.</p>
-        <p class="lead mb-0"><a href="#" class="text-white fw-bold">Continue reading...</a></p>
-      </div>
+    <div class="p-4 p-md-5 mb-4 blog-head">
+        <h1 class="display-4 fst-italic center">Blogga</h1>
+        <p class="lead my-3 center">Multiple lines of text that form the lede, informing new readers quickly and efficiently about what’s most interesting in this post’s contents.</p>
     </div>
+    
   
+<div class="container">
+
     <div class="row mb-2">
         {% for post in posts %}
       <div class="col-md-4 post">
+       
         <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+          <div class="picture"><h3 class="container mb-0"></h3></div>
+          <img src="" alt="">
           <div class="col p-4 d-flex flex-column position-static">
             <h3 class="mb-0">{{post.title}}</h3>
             <div class="mb-1 text-muted">{{post.date_published.strftime('%Y-%m-%d')}}</div>
@@ -25,6 +27,8 @@
       </div>
 
 {% endfor %}
+    </div>
+    </div>
 
 
 {% endblock content %}
