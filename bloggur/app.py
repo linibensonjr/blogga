@@ -20,7 +20,7 @@ migrate = Migrate(app, db)
 app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///' + os.path.join(base_dir, 'bloggur.db')
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = "secret"
-
+api = (os.environ.get("SENDGRID_API_KEY"))
 login_manager = LoginManager()
 login_manager.init_app(app)
 
@@ -135,28 +135,29 @@ def delete_post(id):
 
 @app.route('/about')
 def about():
+
     return render_template('about.html')
 
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():
+    print(os.environ.get("SENDGRID_API_KEY"))
     # using SendGrid's Python Library
 # https://github.com/sendgrid/sendgrid-python
     if request.method == 'POST':
         message = Mail(
-            from_email=request.form.get('email'),
-            to_emails='linibensojr@example.com',
-            subject=request.form.get('subject'),
-            html_content=request.form.get('message'))
-        flash('Message sent successfully')
+                from_email='linibensonjr@gmail.com',
+                to_emails='linibensojr@gmail.com',
+                subject=request.form.get('subject'),
+                html_content=request.form.get('message'))
         try:
-            sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
-            response = sg.send(message)
-            print(response.status_code)
-            print(response.body)
-            print(response.headers)
-            flash('Message sent successfully', category='success')
+                sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
+                response = sg.send(message)
+                print(response.status_code)
+                print(response.body)
+                print(response.headers)
+                flash('Message sent successfully', category='success')
         except Exception as e:
-            pass
+                print(sg, e)
     return render_template('contact.html')
 
 @app.route('/login', methods=['POST', 'GET'])
